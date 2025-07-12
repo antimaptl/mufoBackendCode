@@ -1,0 +1,49 @@
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Django stuff:
+*.log
+*.pot
+*.pyc
+db.sqlite3
+media/
+staticfiles/
+local_settings.py
+
+# If using SQLite database
+*.sqlite3
+
+# Environment files
+.env
+.env.*
+
+# VSCode/IDE settings
+.vscode/
+.idea/
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv/
+Mufo/.env
+
+# macOS files
+.DS_Store
+
+# Coverage reports
+htmlcov/
+.coverage
+.coverage.*
+
+# Migrations (optional — only if you don't want to track them)
+# ** Be cautious — usually migrations SHOULD be tracked
+# ** Uncomment below line only if you know what you're doing
+# */migrations/*.py
+# */migrations/*.pyc
+
+# pip environment and dependency files
+Pipfile.lock
+poetry.lock
