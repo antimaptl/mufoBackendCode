@@ -98,7 +98,7 @@ SPECIAL_OTP = '6666'
 
 # Helper function to send OTP via Twilio
 # List of special numbers
-SPECIAL_NUMBERS = ['+915689745325', '+917564839102', '+919876543210', '+916261709525', '+910000000000']  # Add more special numbers as needed
+SPECIAL_NUMBERS = ['+919999999999', '+917564839102', '+919876543210', '+916261709525', '+910000000000',"+917804017566"]  # Add more special n"umbers as needed
 
 def send_otp_on_phone(phone_number, otp):
     # Send OTP only if the number is NOT in the special numbers list
@@ -1001,3 +1001,24 @@ class SendGiftAPIView(APIView):
             'sender_coins': sender.coins,
             'receiver_coins': receiver.coins
         }, status=status.HTTP_200_OK)
+
+class Userlevel(APIView):
+    def get(self, request, user_id):
+        try:
+            user = User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        coins = user.coins
+        level = Wealthlevel.get_user_level(coins)
+
+        if not level:
+            return Response({"error": "Wealth level not found for this coin range"}, status=404)
+
+        return Response({
+            "user_id": user.id,
+            "user_name": user.Name,
+            "coins": coins,
+            "level": level.level,
+            "badge": level.badge
+        }, status=200)
