@@ -40,4 +40,6 @@ urlpatterns = [
 
     #gift
     path('send-gift/', SendGiftAPIView.as_view(), name='send-gift'),   
+    path('user/<int:user_id>/level/',Userlevel.as_view(),name='userwealthlevel-by-userid'),
+
 ]

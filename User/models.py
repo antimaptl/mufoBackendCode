@@ -29,6 +29,10 @@ class User(models.Model):
     coins = models.PositiveIntegerField(default=0) 
     def __str__(self):
         return str(self.Name)
+    
+    @property
+    def wealth_level(self):
+        return Wealthlevel.get_user_level(self.coins)
 
 
 
@@ -150,3 +154,27 @@ class GiftTransaction(models.Model):
 
     def __str__(self):
         return f"{self.sender.Name} sent {self.gift.name} to {self.receiver.Name}"
+    
+# level set according to user coins
+class Wealthlevel(models.Model):
+    BADGE_CHOICES = [
+        ('brass', 'Brass'),
+        ('silver', 'Silver'),
+        ('gold', 'Gold'),
+        ('diamond', 'Diamond')
+    ]
+    level = models.IntegerField(unique=True)
+    min_coins = models.PositiveIntegerField()
+    max_coins = models.PositiveIntegerField()
+    badge = models.CharField(max_length=20, choices=BADGE_CHOICES)
+
+    class Meta:
+        ordering = ['level']
+
+    def __str__(self):
+        return f"Level {self.level} (Badge: {self.badge})"
+
+    @classmethod
+    def get_user_level(cls, coins):
+        """Find wealth level by coins"""
+        return cls.objects.filter(min_coins__lte=coins, max_coins__gte=coins).first()

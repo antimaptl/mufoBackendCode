@@ -147,3 +147,20 @@ class PostSerializer(serializers.ModelSerializer):
         model = Post5
         fields = ['id', 'user_id', 'user_name', 'text', 'image', 'video', 'created_at']
         read_only_fields = ['created_at']
+
+class UserlevelSerializer(serializers.ModelSerializer):
+    wealth_level = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = ['id', 'Name', 'email', 'coins', 'wealth_level']
+
+    def get_wealth_level(self, obj):
+        level = obj.wealth_level
+        if level:
+            return {
+                'level': level.level,
+                'badge': level.badge,
+                # 'perks': level.perks
+            }
+        return None

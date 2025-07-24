@@ -1166,3 +1166,24 @@ class SendGiftAPIView(APIView):
             'sender_coins': sender.coins,
             'receiver_coins': receiver.coins
         }, status=status.HTTP_200_OK)
+    
+class Userlevel(APIView):
+    def get(self, request, user_id):
+        try:
+            user = User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        coins = user.coins
+        level = Wealthlevel.get_user_level(coins)
+
+        if not level:
+            return Response({"error": "Wealth level not found for this coin range"}, status=404)
+
+        return Response({
+            "user_id": user.id,
+            "user_name": user.Name,
+            "coins": coins,
+            "level": level.level,
+            "badge": level.badge
+        }, status=200)
