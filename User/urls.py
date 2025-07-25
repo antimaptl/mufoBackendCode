@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path,include
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
@@ -6,10 +6,16 @@ from rest_framework_simplejwt.views import (
 from . import views
 from .views import *
 from .views import SendGiftAPIView
+from rest_framework.routers import DefaultRouter
+
+router = DefaultRouter()
+router.register(r'frames', Frameset, basename='frames')
 
 urlpatterns = [
 
+    path('', include(router.urls)),
     path("", views.Users, name="User"),
+    # path('api-token-auth/', obtain_auth_token),
     path("Register/", Register.as_view(), name="Register"),
     path('login/', Login.as_view(), name="login"),
     path('otp/<uid>/', Otp.as_view() , name='otp'),
@@ -41,5 +47,7 @@ urlpatterns = [
     #gift
     path('send-gift/', SendGiftAPIView.as_view(), name='send-gift'),   
     path('user/<int:user_id>/level/',Userlevel.as_view(),name='userwealthlevel-by-userid'),
-
+    path('purchase-frame/', PurchaseFrameAPIView.as_view(), name='purchase-frame'),
+    path('Createfamily/', CreateFamilyAPIView.as_view(), name='create-family'),
+    path('Joinfamily/', JoinFamilyAPIView.as_view(), name='join-family'),
 ]

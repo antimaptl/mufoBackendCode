@@ -164,3 +164,8 @@ class UserlevelSerializer(serializers.ModelSerializer):
                 # 'perks': level.perks
             }
         return None
+
+class FramesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=Frames
+        fields='__all__'

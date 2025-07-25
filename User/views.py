@@ -284,7 +284,9 @@ class Login(APIView):
             uid = uuid.uuid1()
             token = secrets.token_hex(128)
             otp = SPECIAL_OTP if phone in SPECIAL_NUMBERS else random.randint(1000, 9999)
-            email=f"antima@gmail.com"
+            # email=f"antima@gmail.com"
+            email = f"user_{phone}@example.com"
+
             user = User.objects.create(
                 phone=phone,
                 uid=uid,
@@ -1187,3 +1189,114 @@ class Userlevel(APIView):
             "level": level.level,
             "badge": level.badge
         }, status=200)
+
+
+from rest_framework import viewsets
+class Frameset(viewsets.ModelViewSet):
+    queryset=Frames.objects.all()
+    serializer_class = FramesSerializer
+    
+from .models import Frames, PurchasedFrame
+
+# class PurchaseFrameAPIView(APIView):
+#     @authenticate_token
+#     def post(self, request):
+#         user = request.user
+#         frame_id = request.data.get('frame_id')
+
+#         frame = get_object_or_404(Frames, id=frame_id)
+
+#         # ✅ Check if user already purchased this frame
+#         if PurchasedFrame.objects.filter(user=user, frame=frame).exists():
+#             return Response({'error': 'You have already purchased this frame.'}, status=status.HTTP_400_BAD_REQUEST)
+
+#         if user.coins < frame.price_in_coins:
+#             return Response({'error': 'Not enough coins.'}, status=status.HTTP_400_BAD_REQUEST)
+
+#         with transaction.atomic():
+#             user.coins -= frame.price_in_coins
+#             user.save()
+
+#             # ✅ Record the purchase
+#             PurchasedFrame.objects.create(user=user, frame=frame)
+
+#         return Response({'message': 'Frame purchased successfully!'}, status=status.HTTP_200_OK)
+
+
+
+from django.db import transaction
+
+class PurchaseFrameAPIView(APIView):
+    # @authenticate_token
+    @method_decorator(authenticate_token)
+    def post(self, request):
+        user = request.user
+        frame_id = request.data.get('frame_id')
+        frame = get_object_or_404(Frames, id=frame_id)
+
+        if PurchasedFrame.objects.filter(user=user, frame=frame).exists():
+            return Response({'error': 'You already purchased this frame.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if user.coins < frame.coins:
+            return Response({'error': 'Not enough coins.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            with transaction.atomic():
+                user.coins -= frame.coins
+                user.save()
+                PurchasedFrame.objects.create(user=user, frame=frame)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response({
+    'message': 'Frame purchased successfully',
+    'frame_name': frame.name,
+    'frame_cost': frame.coins,
+    'user_name':user.Name,
+    'user_remaining_coins': user.coins
+}, status=status.HTTP_200_OK)
+    
+
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.authentication import TokenAuthentication
+class CreateFamilyAPIView(APIView):
+    @method_decorator(authenticate_token)
+    def post(self, request):
+        user = request.user
+
+        # Check if user is already in a family
+        if FamilyMember.objects.filter(user=user).exists():
+            return Response({'error': 'You are already part of a family.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        family_name = request.data.get('family_name')
+        family_tag = request.data.get('family_tag')
+        family_announcement = request.data.get('family_announcement')
+
+        # Create family and set user as admin
+        family = Family.objects.create(
+            family_name=family_name,
+            family_tag=family_tag,
+            family_announcement=family_announcement,
+            admin=user
+        )
+
+        # Add admin as a member
+        FamilyMember.objects.create(user=user, family=family)
+
+        return Response({'message': 'Family created successfully.'}, status=status.HTTP_201_CREATED)
+
+class JoinFamilyAPIView(APIView):
+    def post(self, request):
+        user = request.user
+        family_id = request.data.get('family_id')
+
+        if FamilyMember.objects.filter(user=user).exists():
+            return Response({'error': 'You already belong to a family.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            family = Family.objects.get(id=family_id)
+        except Family.DoesNotExist:
+            return Response({'error': 'Family not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        FamilyMember.objects.create(user=user, family=family)
+        return Response({'message': 'Joined family successfully.'}, status=status.HTTP_200_OK)
