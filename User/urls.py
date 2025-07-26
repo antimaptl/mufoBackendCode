@@ -7,7 +7,6 @@ from . import views
 from .views import *
 from .views import SendGiftAPIView
 from rest_framework.routers import DefaultRouter
-
 router = DefaultRouter()
 router.register(r'frames', Frameset, basename='frames')
 
@@ -48,6 +47,10 @@ urlpatterns = [
     path('send-gift/', SendGiftAPIView.as_view(), name='send-gift'),   
     path('user/<int:user_id>/level/',Userlevel.as_view(),name='userwealthlevel-by-userid'),
     path('purchase-frame/', PurchaseFrameAPIView.as_view(), name='purchase-frame'),
+
+    #family
     path('Createfamily/', CreateFamilyAPIView.as_view(), name='create-family'),
     path('Joinfamily/', JoinFamilyAPIView.as_view(), name='join-family'),
+    path('Leavefamily/', LeaveFamilyAPIView.as_view(), name='leave-family'),
+    path('Deletefamily/', DeleteFamilyAPIView.as_view(), name='delete-family'),
 ]
