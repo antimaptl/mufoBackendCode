@@ -178,3 +178,30 @@ class Wealthlevel(models.Model):
     def get_user_level(cls, coins):
         """Find wealth level by coins"""
         return cls.objects.filter(min_coins__lte=coins, max_coins__gte=coins).first()
+    
+
+class Frames(models.Model):
+    image=models.ImageField()
+    name=models.CharField(max_length=20)
+    coins=models.IntegerField()
+    
+    def __str__(self):
+        return self.name
+
+class PurchasedFrame(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    frame = models.ForeignKey(Frames, on_delete=models.CASCADE)
+    purchase_date = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'frame') 
+        
+class Family(models.Model):
+    family_name = models.CharField(max_length=50, blank=True)
+    family_tag = models.CharField(max_length=8, blank=True)
+    family_announcement = models.CharField(max_length=500, blank=True)
+    admin = models.OneToOneField(User, on_delete=models.CASCADE, related_name='admin_of_family')
+
+class FamilyMember(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='family_member')
+    family = models.ForeignKey(Family, on_delete=models.CASCADE, related_name='members')

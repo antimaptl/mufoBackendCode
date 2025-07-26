@@ -39,25 +39,47 @@ from Coins_trader.models import Coins_trader
 from Jockey_club_owner.models import Jockey_club_owner
 from master.models import Common
 
+# def authenticate_token(view_func):
+#     def wrapper(request, *args, **kwargs):
+#         token = request.META.get('HTTP_AUTHORIZATION', '').split(' ')[-1]
+
+#         models = [User, Audio_Jockey,Jockey_club_owner, Coins_club_owner,Coins_trader,]
+#         user = None
+
+#         for model in models:
+#             try:
+#                 user = model.objects.get(token=token)
+#                 break
+#             except model.DoesNotExist:
+#                 continue
+
+#         if user is None:
+#             return JsonResponse({'error': 'Invalid token'}, status=401)
+
+#         request.user = user
+#         return view_func(request, *args, **kwargs)
+
+#     return wrapper
+
+from functools import wraps
+
 def authenticate_token(view_func):
-    def wrapper(request, *args, **kwargs):
+    @wraps(view_func)
+    def wrapper(request, *args, **kwargs):  # ✅ First arg is 'request'
         token = request.META.get('HTTP_AUTHORIZATION', '').split(' ')[-1]
 
-        models = [User, Audio_Jockey,Jockey_club_owner, Coins_club_owner,Coins_trader,]
         user = None
-
-        for model in models:
+        for model in [User, Audio_Jockey, Jockey_club_owner, Coins_club_owner, Coins_trader]:  # adjust as needed
             try:
                 user = model.objects.get(token=token)
                 break
             except model.DoesNotExist:
                 continue
 
-        if user is None:
-            return JsonResponse({'error': 'Invalid token'}, status=401)
+        if not user:
+            return JsonResponse({'error': 'Invalid or missing token'}, status=401)
 
-        request.user = user
+        request.user = user  # ✅ Attach user to request
         return view_func(request, *args, **kwargs)
 
     return wrapper
-

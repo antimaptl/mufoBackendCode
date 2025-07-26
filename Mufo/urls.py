@@ -17,7 +17,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls.static import static
 from django.conf import settings
-
+from rest_framework.authtoken.views import obtain_auth_token
 admin.site.site_header = "Mufo Admin Portal"
 admin.site.site_title = "Mufo Admin Portal"
 admin.site.index_title = "Welcome to Mufo admin Portal"
@@ -26,6 +26,7 @@ admin.site.index_title = "Welcome to Mufo admin Portal"
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api-token-auth/', obtain_auth_token),
     path("audio_jockey/", include("Audio_Jockey.urls")),
     path("Coins_club_owner/", include("Coins_club_owner.urls")),
     path("coins_trader/", include("Coins_trader.urls")),
