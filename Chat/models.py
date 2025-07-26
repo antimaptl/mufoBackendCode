@@ -8,7 +8,7 @@ from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 import json
 class Bot(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE,null=True,blank=True)
     file_name = models.CharField(max_length=33)
     message_handler = models.CharField(max_length=255)
     description = models.CharField(max_length=255, null=True)
@@ -65,8 +65,8 @@ class Visitor(models.Model):
         return '<user_agent:{}'.format(self.user_agent)    
 
 class Chat(models.Model):
-    room = models.ForeignKey(Room, on_delete=models.CASCADE, null=True)
-    from_user = models.ForeignKey(User, on_delete=models.CASCADE)
+    room = models.ForeignKey(Room, on_delete=models.CASCADE, null=True,blank=True)
+    from_user = models.ForeignKey(User, on_delete=models.CASCADE,null=True,blank=True)
     text = models.TextField(null=False)
     created = models.DateTimeField(auto_now_add=True, null=True)
     
@@ -75,8 +75,8 @@ class Chat(models.Model):
 
 
 class ChatMessage(models.Model):
-    sender = models.ForeignKey(Common, on_delete=models.CASCADE, related_name='sent_messages')
-    receiver = models.ForeignKey(Common, on_delete=models.CASCADE, related_name='received_messages')
+    sender = models.ForeignKey(Common, on_delete=models.CASCADE, related_name='sent_messages',blank=True,null=True)
+    receiver = models.ForeignKey(Common, on_delete=models.CASCADE, related_name='received_messages',blank=True,null=True)
     timestamp = models.DateTimeField(auto_now_add=True)
     content = models.TextField()
 

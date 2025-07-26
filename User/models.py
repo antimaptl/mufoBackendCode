@@ -201,7 +201,11 @@ class Family(models.Model):
     family_tag = models.CharField(max_length=8, blank=True)
     family_announcement = models.CharField(max_length=500, blank=True)
     admin = models.OneToOneField(User, on_delete=models.CASCADE, related_name='admin_of_family')
+    # class Meta:
+    #     db_table = 'User_family'
 
 class FamilyMember(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='family_member')
     family = models.ForeignKey(Family, on_delete=models.CASCADE, related_name='members')
+    # class Meta:
+    #     db_table = 'User_familymember'
