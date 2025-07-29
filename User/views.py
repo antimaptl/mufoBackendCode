@@ -1286,6 +1286,7 @@ class CreateFamilyAPIView(APIView):
         return Response({'message': 'Family created successfully.'}, status=status.HTTP_201_CREATED)
 
 class JoinFamilyAPIView(APIView):
+    @method_decorator(authenticate_token)
     def post(self, request):
         user = request.user
         family_id = request.data.get('family_id')
@@ -1300,3 +1301,35 @@ class JoinFamilyAPIView(APIView):
 
         FamilyMember.objects.create(user=user, family=family)
         return Response({'message': 'Joined family successfully.'}, status=status.HTTP_200_OK)
+    
+class LeaveFamilyAPIView(APIView):
+    @method_decorator(authenticate_token)
+    def post(self, request):
+        user = request.user
+
+        try:
+            membership = FamilyMember.objects.get(user=user)
+        except FamilyMember.DoesNotExist:
+            return Response({'error': 'You are not part of any family.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        membership.delete()
+        return Response({'message': 'You have left the family successfully.'}, status=status.HTTP_200_OK)
+class DeleteFamilyAPIView(APIView):
+    @method_decorator(authenticate_token)
+    def delete(self, request):
+        user = request.user
+
+        try:
+            family = Family.objects.get(admin=user)
+        except Family.DoesNotExist:
+            return Response({'error': 'You are not an admin of any family.'}, status=status.HTTP_403_FORBIDDEN)
+
+        members = FamilyMember.objects.filter(family=family)
+        for member in members:
+            member_user = member.user         
+        
+        
+        members.delete()
+        family.delete()
+
+        return Response({'message': 'Family and all memberships deleted successfully.'}, status=status.HTTP_200_OK)
