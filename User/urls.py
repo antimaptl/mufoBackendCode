@@ -53,4 +53,5 @@ urlpatterns = [
     path('Joinfamily/', JoinFamilyAPIView.as_view(), name='join-family'),
     path('Leavefamily/', LeaveFamilyAPIView.as_view(), name='leave-family'),
     path('Deletefamily/', DeleteFamilyAPIView.as_view(), name='delete-family'),
+    
 ]

@@ -1191,6 +1191,9 @@ class Userlevel(APIView):
         }, status=200)
 
 
+#wealth level according to razorpay
+
+
 from rest_framework import viewsets
 class Frameset(viewsets.ModelViewSet):
     queryset=Frames.objects.all()
